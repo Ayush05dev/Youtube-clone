@@ -12,8 +12,8 @@ const ButtonList = () => {
   return (
     <div className={`fixed top-24  right-0 bg-white  ${!isMenuOpen ? "left-[150px]" : "left-[280px]"}`}>
     <div className='flex overflow-x-scroll space-x-4 no-scrollbar h-30 p-2   '>
-      {btnList.map((item)=>(
-        <Button name={item}/>
+      {btnList.map((item,index)=>(
+        <Button key={index} name={item}/>
       ))}
       </div>
       </div>

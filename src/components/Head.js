@@ -1,24 +1,34 @@
 
 import React, {useEffect, useState} from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toggleMenu } from "../utils/appSlice";
 import bellIcon from '../assets/bell.svg';
 import createIcon from '../assets/create.svg';
 import { YOUTUBE_SEARCH_API } from '../utils/constants';
-
+import { cacheResults } from '../utils/searchSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Head = () => {
 
   const [searchQuery , setSearchQuery]=useState("");
   const [suggestions,setSuggestions]=useState([])
   const [showSuggestions,setShowSuggestions] =useState(false)
+  //const [clickOnSuggestion,setClickOnSuggestion]=useState(false);
+  const searchCache = useSelector((store)=>store.search)
 // Debouncing 
 
   useEffect(()=>{
    
     // make an api call after evry key press but if the difference in 2 key strokes is < 200ms then 
     // decline the api calls
-const timer = setTimeout(()=> getSearchSuggestions(),200);
+    console.log("Search Query is :" + searchQuery)
+const timer = setTimeout(()=> {
+  if(searchCache[searchQuery])
+    setSuggestions(searchCache[searchQuery])
+  else
+  getSearchSuggestions()
+}
+  ,200);
 
 return ()=>{
   clearTimeout(timer);
@@ -49,6 +59,10 @@ return ()=>{
     const json= await data.json();
     setSuggestions(json[1])
     //console.log(json[1]);
+    // update the cache with this suggestion
+    dispatch(cacheResults({
+      [searchQuery]:json[1]
+    }))
   }
 
 
@@ -57,6 +71,19 @@ return ()=>{
     dispatch(toggleMenu());
   };
 
+  const handleBlur = () => {
+    // Use a timeout to delay hiding suggestions
+    setTimeout(() => {
+      
+      setShowSuggestions(false);
+    }, 300); // Delay to allow the click event to register
+  };
+  
+  const navigate =useNavigate()
+  const getSearchVideos = (s)=>{
+    navigate('/results?search_query=' + encodeURI(s));
+  // window.location.href = '/results?search_query=' + encodeURI(s);
+  }
   return (
     <div className='grid grid-flow-col p-5 shadow-lg fixed top-0 w-full bg-white z-50'>
       <div className='flex col-span-1'>
@@ -76,16 +103,35 @@ return ()=>{
           value={searchQuery}
           onChange={(e)=>setSearchQuery(e.target.value)}
           onFocus={()=>setShowSuggestions(true)}
-          onBlur={()=>setShowSuggestions(false)}
+          onBlur={handleBlur}
+          spellCheck={false}
+          onKeyDown={(e)=>{
+            if(e.key=="Enter"){
+            getSearchVideos(searchQuery)
+            setShowSuggestions(false)
+            }
+          }}
           />
+          {searchQuery && <button onClick={() => setSearchQuery("")} className='absolute hover:bg-gray-200 hover:rounded-full font-bold w-9 h-9 left-[64%] top-[25px]'>X</button>}
         <button
-          className='border border-gray-400 p-2 rounded-e-full bg-red-700 text-white font-bold hover:bg-red-800'>
+          className='border border-gray-400 p-2 rounded-e-full bg-red-700 text-white font-bold hover:bg-red-800'
+          onClick={()=>{getSearchVideos(searchQuery)
+            setShowSuggestions(false)
+          }
+          }
+          >
           Search
         </button>
         </div>
         {showSuggestions && <div className='fixed bg-white py-3 px-5 w-[44.5%] rounded-lg shadow-xl text-base font-bold'>
           <ul>
-            {suggestions.map(s=> <li className='py-1 hover:bg-gray-100'>{s}</li>)}
+            {suggestions.map((s,index)=> <li key={index} className='py-1 hover:bg-gray-100 cursor-pointer'
+            value={s}
+            onClick={()=>{setSearchQuery(s)
+              getSearchVideos(s)
+            }
+            }
+            > <img  className='mr-5 h-4 ml-3 inline-block' alt='search-icon' src='https://cdn-icons-png.flaticon.com/512/482/482631.png' /> {s}</li>)}
           </ul>
         </div>}
         
