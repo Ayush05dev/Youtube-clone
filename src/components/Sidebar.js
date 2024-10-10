@@ -44,9 +44,6 @@ const Sidebar = () => {
   if(!isMenuOpen)
     return null;
 
-  // return (
-  //   // <h1 className='w-20'>Hello , I am Sidebar kjbghjbv sbnvjkdfnj jkbfbkj jnjnbkj incompletenessofyour</h1>
-  // )
 
   return (
     <div className='p-5 max-h-screen hover:overflow-y-scroll overflow-hidden overscroll-contain fixed top-[110px] z-50 bg-white text-left w-[280px] no-scrollbar'>
