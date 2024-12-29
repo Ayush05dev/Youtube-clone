@@ -11,7 +11,10 @@
 
 # production
 /build
-/src/utils/constants.js
+
+# Environment Variables
+.env
+
 
 # misc
 .DS_Store
