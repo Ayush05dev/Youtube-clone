@@ -8,8 +8,10 @@
 # testing
 /coverage
 
+
 # production
 /build
+/src/utils/constants.js
 
 # misc
 .DS_Store
