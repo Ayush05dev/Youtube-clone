@@ -1,5 +1,5 @@
 import React, { useEffect,useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { closeMenu } from '../utils/appSlice'
 import { useSearchParams,Link } from 'react-router-dom'
 import { formatCompactNumber } from '../utils/helper'
